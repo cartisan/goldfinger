@@ -1,3 +1,4 @@
+from __future__ import print_function
 from pprint import pprint
 from random import randint
 import sys
@@ -64,9 +65,9 @@ def choose_step(steps, current_rating, prev=True):
             # the action-pair table doesn't contain an entry for such a midpoint
             continue
 
-    print "All Midpoint rows ending on Befor-action of conflict:"
+    print("All Midpoint rows ending on Befor-action of conflict:")
     pprint(all_midpoint_steps)
-    print
+    print()
 
     # filter out all action-pair tuples that were not tension scored:
     filtered_midpoint_steps = []
@@ -74,9 +75,9 @@ def choose_step(steps, current_rating, prev=True):
         if ap1[1] and ap2[1]:
             filtered_midpoint_steps.append((ap1, ap2))
 
-    print "All Midpoint rows that have tension ratings for both pairs:"
+    print("All Midpoint rows that have tension ratings for both pairs:")
     pprint(filtered_midpoint_steps)
-    print
+    print()
 
     if len(filtered_midpoint_steps) == 0:
         raise Exception("Not enough rated action-pairs")
@@ -91,17 +92,17 @@ def choose_step(steps, current_rating, prev=True):
             if float(ap1[1]) <= current_rating and float(ap2[1]) <= float(ap1[1]):
                 fitting_midpoint_steps.append((ap1, ap2))
 
-    print "All Midpoint rows that fit tension curve:"
+    print("All Midpoint rows that fit tension curve:")
     pprint(fitting_midpoint_steps)
-    print
+    print()
 
     if len(fitting_midpoint_steps) == 0:
         raise Exception("No midpoints that fit tension curve")
 
     random_midpoint = randint(0, len(fitting_midpoint_steps)-1)
 
-    print fitting_midpoint_steps[random_midpoint]
-    print
+    print(fitting_midpoint_steps[random_midpoint])
+    print()
 
     return fitting_midpoint_steps[random_midpoint]
 
@@ -111,7 +112,7 @@ def generate_previous_step(action, current_rating):
         steps = find_previous_steps(action)
     except KeyError as e:
         # no midpoint data for this climax
-        print e
+        print(e)
         return []
 
     # try to find a previous step, if not enugh data
@@ -122,8 +123,8 @@ def generate_previous_step(action, current_rating):
         return []
 
     prev_step = list(prev_step)
-    print "Previous step:"
-    print prev_step
+    print("Previous step:")
+    print(str(prev_step))
     return prev_step
 
 
@@ -156,7 +157,7 @@ def generate_next_step(action, current_rating):
         steps = find_next_steps(action)
     except KeyError as e:
         # no midpoint data for this climax
-        print e
+        print(e)
         return []
 
     # try to find a previous step, if not enugh data
@@ -167,8 +168,8 @@ def generate_next_step(action, current_rating):
         return []
 
     prev_step = list(prev_step)
-    print "Previous step:"
-    print prev_step
+    print("Previous step:")
+    print(prev_step)
     return prev_step
 
 
@@ -179,9 +180,9 @@ def generate_story():
     while not prev_step or not next_step:
         # pick untried climax
         if count >= NUM_OF_CLIMAXES - 1:
-            print "Searched for to long! Tried climaxes:"
+            print("Searched for to long! Tried climaxes:")
             pprint(sorted(tried_climaxes))
-            print
+            print()
             sys.exit()
 
         action, current_rating = pick_climax()
@@ -193,17 +194,17 @@ def generate_story():
 
         tried_climaxes.append(unique_id)
         count += 1
-        print "===================================="
-        print "Trying climax number:", count
-        print action
-        print
+        print("====================================")
+        print("Trying climax number:" + str(count))
+        print(action)
+        print()
 
         prev_step = generate_previous_step(action, current_rating)
         next_step = generate_next_step(action, current_rating)
 
     story = prev_step + [action] + next_step
-    print "\nFinal Story:"
-    print story
+    print("\nFinal Story:")
+    print(story)
     return story
 
 story = generate_story()
