@@ -45,7 +45,7 @@ def find_previous_steps(action):
     return steps
 
 
-def choose_prev_step(steps, current_rating):
+def choose_step(steps, current_rating, prev=True):
     # turn midpoint row into 2 actions:
     # (BeforeM, M, AfterM) --> (BeforeM, rating, M), (M, rating, AfterM)
     all_midpoint_steps = []
@@ -84,8 +84,12 @@ def choose_prev_step(steps, current_rating):
     # select action-pair tuple fitting to our curve
     fitting_midpoint_steps = []
     for (ap1, ap2) in filtered_midpoint_steps:
-        if float(ap2[1]) <= current_rating and float(ap1[1]) <= float(ap2[1]):
-            fitting_midpoint_steps.append((ap1, ap2))
+        if prev:
+            if float(ap2[1]) <= current_rating and float(ap1[1]) <= float(ap2[1]):
+                fitting_midpoint_steps.append((ap1, ap2))
+        else:
+            if float(ap1[1]) <= current_rating and float(ap2[1]) <= float(ap1[1]):
+                fitting_midpoint_steps.append((ap1, ap2))
 
     print "All Midpoint rows that fit tension curve:"
     pprint(fitting_midpoint_steps)
@@ -113,7 +117,52 @@ def generate_previous_step(action, current_rating):
     # try to find a previous step, if not enugh data
     # return empty list
     try:
-        prev_step = choose_prev_step(steps, current_rating)
+        prev_step = choose_step(steps, current_rating)
+    except:
+        return []
+
+    prev_step = list(prev_step)
+    print "Previous step:"
+    print prev_step
+    return prev_step
+
+
+# ================ next steps generation ===============
+# TODO: refactor to use same code as previous with parameter
+
+def find_next_steps(action):
+    """ Returns a list of midpoint rows that each represents
+    possible next steps:
+
+        [  {'After Midpoint': ['beg_forgiveness_from'], <-- possible step 1
+            'Before Midpoint': ['spy_on'],
+            'Midpoint': ['are_discovered_by']},
+
+           {...}                                         <-- possible step 2
+        ]
+    """
+
+    before_midpoint = action[2]
+    try:
+        steps = find_by_attribute(MIDPOINTS, "Before Midpoint", before_midpoint)
+    except KeyError:
+        raise KeyError("Midpoints have no 'Before Midpoint' for: {}"
+                       .format(before_midpoint))
+    return steps
+
+
+def generate_next_step(action, current_rating):
+    try:
+        steps = find_next_steps(action)
+    except KeyError as e:
+        # no midpoint data for this climax
+        print e
+        return []
+
+    # try to find a previous step, if not enugh data
+    # return empty list
+    try:
+        prev_step = choose_step(steps, current_rating, prev=False)
     except:
         return []
 
@@ -126,12 +175,12 @@ def generate_previous_step(action, current_rating):
 # this is one that works:
 # action = ("beg_forgiveness_from", 5, "are_banished_by")
 
-prev_step = []
+prev_step, next_step = [], []
 count = 0
 tried_climaxes = []
-while not prev_step:
+while not prev_step or not next_step:
     # pick untried climax
-    if count > 200:
+    if count >= NUM_OF_CLIMAXES - 1:
         print "Searched for to long! Tried climaxes:"
         pprint(sorted(tried_climaxes))
         print
@@ -152,7 +201,8 @@ while not prev_step:
     print
 
     prev_step = generate_previous_step(action, current_rating)
+    next_step = generate_next_step(action, current_rating)
 
 prev_step.append(action)
 print "\nFinal Story:"
-print prev_step
+print prev_step + next_step
