@@ -2,7 +2,8 @@ from cc_pattern.noc import parse, index
 
 
 # ---------------------- data tables ----------------------------
-ACTION_PAIRS = parse("Veale's action pairs.xlsx")
+ACTION_PAIRS = parse("Veale's action pairs 2.xlsx")
+MIDPOINTS = parse("Veale's script midpoints.xlsx")
 LOCATIONS = parse("Veale's location listing.xlsx")
 NOC = parse("Veale's The NOC List.xlsx")
 
