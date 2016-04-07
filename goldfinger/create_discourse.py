@@ -56,6 +56,7 @@ def choose_prev_step(steps, current_rating):
             # the action-pair table doesn't contain an entry for such a midpoint
             continue
 
+    print "All Midpoint rows ending on Befor-action of conflict:"
     pprint(all_midpoint_steps)
     print
 
@@ -65,32 +66,39 @@ def choose_prev_step(steps, current_rating):
         if ap1[1] and ap2[1]:
             filtered_midpoint_steps.append((ap1, ap2))
 
+    print "All Midpoint rows that have tension ratings for both pairs:"
     pprint(filtered_midpoint_steps)
     print
+    
+    if len(filtered_midpoint_steps) == 0:
+        raise Exception("Not enough rated action-pairs")
 
     # select action-pair tuple fitting to our curve
     fitting_midpoint_steps = []
     for (ap1, ap2) in filtered_midpoint_steps:
         if float(ap2[1]) <= current_rating and float(ap1[1]) <= float(ap2[1]):
             fitting_midpoint_steps.append((ap1, ap2))
-
+            
+    print "All Midpoint rows that fit tension curve:"
     pprint(fitting_midpoint_steps)
     print
-
-    print len(fitting_midpoint_steps)-1
+    
+    if len(fitting_midpoint_steps) == 0:
+        raise Exception("No midpoints that fit tension curve")
+        
     random_midpoint = randint(0, len(fitting_midpoint_steps)-1)
-
+    
     print fitting_midpoint_steps[random_midpoint]
     print
 
     return fitting_midpoint_steps[random_midpoint]
 
 
-
-# action = pick_climax()
-action = ("beg_forgiveness_from", 5, "are_banished_by")
+#action = ("beg_forgiveness_from", 5, "are_banished_by")
+action = pick_climax()
 current_rating = action[1]
 
+print "Initial climax:"
 print action
 print
 
