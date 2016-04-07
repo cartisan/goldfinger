@@ -172,37 +172,38 @@ def generate_next_step(action, current_rating):
     return prev_step
 
 
-# this is one that works:
-# action = ("beg_forgiveness_from", 5, "are_banished_by")
+def generate_story():
+    prev_step, next_step = [], []
+    count = 0
+    tried_climaxes = []
+    while not prev_step or not next_step:
+        # pick untried climax
+        if count >= NUM_OF_CLIMAXES - 1:
+            print "Searched for to long! Tried climaxes:"
+            pprint(sorted(tried_climaxes))
+            print
+            sys.exit()
 
-prev_step, next_step = [], []
-count = 0
-tried_climaxes = []
-while not prev_step or not next_step:
-    # pick untried climax
-    if count >= NUM_OF_CLIMAXES - 1:
-        print "Searched for to long! Tried climaxes:"
-        pprint(sorted(tried_climaxes))
+        action, current_rating = pick_climax()
+        unique_id = action[0] + ":" + action[2]
+
+        if unique_id in tried_climaxes:
+            # had that one already
+            continue
+
+        tried_climaxes.append(unique_id)
+        count += 1
+        print "===================================="
+        print "Trying climax number:", count
+        print action
         print
-        sys.exit()
 
-    action, current_rating = pick_climax()
-    unique_id = action[0] + ":" + action[2]
+        prev_step = generate_previous_step(action, current_rating)
+        next_step = generate_next_step(action, current_rating)
 
-    if unique_id in tried_climaxes:
-        # had that one already
-        continue
+    story = prev_step + [action] + next_step
+    print "\nFinal Story:"
+    print story
+    return story
 
-    tried_climaxes.append(unique_id)
-    count += 1
-    print "===================================="
-    print "Trying climax number:", count
-    print action
-    print
-
-    prev_step = generate_previous_step(action, current_rating)
-    next_step = generate_next_step(action, current_rating)
-
-prev_step.append(action)
-print "\nFinal Story:"
-print prev_step + next_step
+generate_story()
