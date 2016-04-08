@@ -4,6 +4,7 @@ Let's generate a story, shall we?
 from random import randint
 
 from create_fabula import generate_story
+from discourse import generate_partial_story
 from discourse_locations import generate_location_story
 from discourse_connectors import get_connector
 
@@ -61,10 +62,10 @@ class Generator(object):
         for i in range(story_length):
             frame = self.frame_story[i]
             # check if last tuple
-            # if i == story_length-1:
-            #     frame = generate_partial_story(frame, isLast=True)
-            # else:
-            #     frame = generate_partial_story(frame)
+            if i == story_length-1:
+                frame = generate_partial_story(frame, isLast=True)
+            else:
+                frame = generate_partial_story(frame)
             self.partial_story.append(frame)
 
     def generate_embellish(self):
@@ -78,11 +79,14 @@ class Generator(object):
 
     def generate(self):
         self.generate_frame()
+        print self.frame_story
         self.generate_tension_arc()
-        # self.generate_partial()
-        # self.generate_embellish()
-        # # export the story
-        # return self.export(self.embellished_story)
+        self.generate_partial()
+        print self.partial_story
+        self.generate_embellish()
+        print self.embellished_story
+        # export the story
+        return self.export(self.embellished_story)
 
     def export(self, storyLst):
         '''
@@ -91,11 +95,12 @@ class Generator(object):
         Input: list of tuples (String, int) storyLst
         Output: String text
         '''
-        f = open(storyLst + '.txt', 'w')
+        f = open(self.storyName + '.txt', 'w')
         # compile
         story = ''
-        for text, tension in storyLst:
-            story += text
+        for textComp in storyLst:
+            text = textComp[0]
+            story += text + " \n"
         f.write(story)
         return story
 

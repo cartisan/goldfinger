@@ -28,8 +28,11 @@ RANDOM_CONNECTORS = [
                 ]
 
 
-def get_connector(textTriple):
-    text, tension, has_descr = textTriple
+def get_connector(textContent):
+    if len(textContent) == 3:
+        text, tension, has_descr = textContent
+    else:
+        text, tension = textContent
     # add connector according to available description
     if tension == '5.0':
         # prepend the connector
