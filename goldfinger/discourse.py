@@ -1,6 +1,7 @@
 from create_fabula import generate_story
 from random import randint
 import re
+from data import NOC
 
 # 1. Search an element in the Scalextric CSV-converted data with the corresponding columnheader and rowheader
 
@@ -88,16 +89,28 @@ def conjunction(tuplestory):
 
 print(conjunction(('are_rewarded_with', '2.0', 'take_advantage_of')))
 
+FIRST_CHAR = ''
+SECOND_CHAR = ''
 
-# 6. Replace A and B by characters:
 
-#def make_characters():
+# 6. Make characters
 
+def make_characters():
+	number = 804
+	char_i1 = randint(0, number)
+	char_i2 = randint(0, number)
+	FIRST_CHAR += NOC[char_i1]['Character']
+	SECOND_CHAR += NOC[char_i2]['Character']
+
+make_characters()
+print(FIRST_CHAR)
 
 
 
 
 # TUPLES GENERATION: PHASE 1
+
+
 
 def generate_partial_story(tuplestory, isLast=False):
 	verb1 = tuplestory[0]
@@ -107,7 +120,7 @@ def generate_partial_story(tuplestory, isLast=False):
 	idiom1 = dice( csv_search("cc_pattern/Veale's idiomatic actions.txt", "Idiomatic Forms", verb1) )
 	idiom2 = dice( csv_search("cc_pattern/Veale's idiomatic actions.txt", "Idiomatic Forms", verb2) )
 
-	if islast:
+	if isLast:
 		if conj == "and":
 			return (str(idiom1) + " " + conj  + " " + str(idiom2), intensity)
 		else: 
@@ -124,15 +137,15 @@ def generate_partial_story(tuplestory, isLast=False):
 		else:
 			return tuple(idiom, intensity)
 		"""
-		return (idiom1, intensity)
+		make_characters()
+		return (idiom1.replace("A", FIRST_CHAR).replace("B", SECOND_CHAR), intensity)
 
 
 def introduction(firsttuple):
-
 	verb1 = firsttuple[0]
 	intensity = firsttuple[1]
 	intro = dice( csv_search("cc_pattern/Veale's initial bookend actions.txt", "Establishing Action", verb1) )
-	return ((str(intro + ". ")),(intensity) )
+	return ((str(intro.replace("A", FIRST_CHAR).replace("B", SECOND_CHAR) + ". ")),(intensity) )
 
 print(introduction(('are_worshipped_by', '2.0', 'condescend_to')))
 
@@ -142,46 +155,7 @@ def ending(lasttuple):
 	intensity = lasttuple[1]
 	ending = dice( csv_search("cc_pattern/Veale's closing bookend actions.txt", "Closing Action", verb) )
 	ending = ending.replace('\"', "")
-	ending[0].upper()
+	ending = ending[0].upper() + ending[1:]
 	return ((str(ending + ". "), (intensity) ))
 
 print(ending(('trust', '3.0', 'are_abducted_by')))
-
-
-
-
-# TRYOUT
-
-
-
-
-
-
-"""
-for sentence in story:
-	print(generate_partial_story(sentence))
-"""
-
-
-
-
-
-"""
-chosen_idiom = dice(idiom)
-print(chosen_idiom)
-
-idiomlist = ['spy_on', 'are_discovered_by', 'beg_forgiveness_from', 'are_killed_by', 'haunt', 'are_exorcized_by']
-
-story = []
-
-for idiom in idiomlist: 
-	story.append(csv_search("Veale's idiomatic actions.txt", "Idiomatic Forms", idiom))
-
-
-print(". ".join(story))
-
-"""
-
-
-
-
