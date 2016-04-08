@@ -55,6 +55,11 @@ def get_location_by_tension(tension):
     return rand(locations_on_tension)
 
 
+def get_location_at_random():
+    location = rand(find_by_attribute(LOCATIONS, "Preposition", "in"))
+    return location
+
+
 # ---------------------------- tension estimation ----------------------------#
 
 def estimate_location_tension():
@@ -184,21 +189,24 @@ def generate_location_story(storyPart):
     Search for a location and add it to a sentence of a story.
 
     Input: tuple (storySentence, tensionLevel)
-    Output: single (storySentence+location)
+    Output: tuple (storySentence+location, tensionLevel, bool has_descr)
     '''
     sentence, tension = storyPart
-    location = get_location_by_tension(tension)
+    # location = get_location_by_tension(tension)
+    location = get_location_at_random()
     props = True
-    descr = bool(randint(0, NUTSNESS) == 0)
-    return add_location_discourse(
+    descr = bool(randint(0, NUTSNESS) != 0)
+    story_with_location = add_location_discourse(
         sentence,
         location,
         add_props=props,
         add_descr=descr
         )
+    return (story_with_location, tension, descr)
 
 
 if __name__ == "__main__":
+    # for testing
     print add_location_discourse(
         "He was killed",
         "changing room",

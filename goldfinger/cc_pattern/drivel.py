@@ -7,18 +7,18 @@ from random import choice
 
 # For example:
 
-for s in wordnet.synsets("soul"):
-    print s.synonyms
-    print s.gloss
-    print
+# for s in wordnet.synsets("soul"):
+#     print s.synonyms
+#     print s.gloss
+#     print
     
 # Other relations include hypernyms (categories) and hyponyms (examples):
 
-s = wordnet.synsets("soul")[0]
-print s
-print s.hypernym
-print s.hyponyms()
-print
+# s = wordnet.synsets("soul")[0]
+# print s
+# print s.hypernym
+# print s.hyponyms()
+# print
 
 # We can play around with this network, for example
 # by randomly moving up and down the hypernyms and hyponyms.
@@ -31,8 +31,8 @@ def shift(noun):
     h = choice(s.hyponyms(recursive=True) or [s])
     return [h.synonyms[0], h.gloss]
     
-print shift("soul")
-print
+# print shift("soul")
+# print
 # ["poltergeist", "a ghost that announces its presence with rapping and the creation of disorder"]
 
 def alliterate(noun, head=2, tail=1):
@@ -43,8 +43,8 @@ def alliterate(noun, head=2, tail=1):
         if noun[:head] == a[:head] and noun[-tail:] == a[-tail:]:
             yield a
             
-print list(alliterate("poltergeist", head=3))
-print
+# print list(alliterate("poltergeist", head=3))
+# print
 # polyglot poltergeist
 # polyvalent poltergeist
 # politically correct poltergeist
@@ -75,14 +75,14 @@ def drivel(noun):
             drivel.append(w)
     return " ".join(drivel)
 
-print "poetic drivel"
-print "-------------"
-print
+# print "poetic drivel"
+# print "-------------"
+# print
 
-for w in (
-  "soul",        # the visible disembodied pointillist poltergeist of a dead King's Counsel
-  "creativity",  # a knockabout knot of resources
-  "machine"):    # any macho magneto that made ovarian overexploitation of genitourinary geothermal energy to do work
-    print w.upper()
-    print drivel(w)
-    print
+# for w in (
+#   "soul",        # the visible disembodied pointillist poltergeist of a dead King's Counsel
+#   "creativity",  # a knockabout knot of resources
+#   "machine"):    # any macho magneto that made ovarian overexploitation of genitourinary geothermal energy to do work
+#     print w.upper()
+#     print drivel(w)
+#     print
