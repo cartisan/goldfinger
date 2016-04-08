@@ -1,12 +1,12 @@
 from __future__ import print_function
 from pprint import pprint
-from random import randint
+from random import randint, choice
 import sys
 
 from data import ACTION_PAIRS, MIDPOINTS
 from data import find_by_attribute
 
-
+CONF_PROB = {5: 0.6, 4: 0.3, 3: 0.1}
 NUM_OF_CLIMAXES = len(find_by_attribute(ACTION_PAIRS, "Tension", "5.0"))
 
 # datatypes:
@@ -15,14 +15,29 @@ NUM_OF_CLIMAXES = len(find_by_attribute(ACTION_PAIRS, "Tension", "5.0"))
 # story_graph -> [action, action, ...]
 
 
+def pick_conflict_tension():
+    """ Creates a probability distribution using probabilities
+    in CONF_PROB and picks an tension-level by random.
+
+    Returns
+        int: tension level
+    """
+    rating_dist = []
+    for rating, prob in CONF_PROB.items():
+        ratings = [rating] * int(prob * 10)
+        rating_dist += ratings
+    return choice(rating_dist)
+
+
 def pick_climax():
     """ Returns a climax action: (Before, 5, After) and its rating"""
 
-    climaxes = find_by_attribute(ACTION_PAIRS, "Tension", "5.0")
+    conflict_tension = str(float(pick_conflict_tension()))
+    climaxes = find_by_attribute(ACTION_PAIRS, "Tension", conflict_tension)
     random_num = randint(0, len(climaxes)-1)
     climax = climaxes[random_num]
     action = (climax["Before"], climax["Tension"], climax["After"])
-    return action, 5
+    return action, int(float(conflict_tension))
 
 
 def find_previous_steps(action):
