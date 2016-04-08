@@ -89,8 +89,8 @@ class Person(Row):
         try:
             self.character[0]
         except:
-            print "person.py: No name found for {}".\
-                format(self.character)
+            print("person.py: No name found for {}".\
+                format(self.character))
             self.character = ['']
 
     def find_mates():

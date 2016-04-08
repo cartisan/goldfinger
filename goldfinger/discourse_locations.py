@@ -16,21 +16,22 @@ roomette in which things are stored."
 from random import randint
 
 from cc_pattern.drivel import drivel
-from cc_pattern.noc import index
+# from cc_pattern.noc import index
 from pattern.en import pluralize, sentiment, referenced
 import math
 
 from data import find_by_attribute, LOCATIONS
 
-NUTSNESS = 10
 
+NUTSNESS = 3
 
-# -------------------------------- getters -----------------------------------#
 
 def rand(lst):
     '''Get random element from a list'''
     return lst[randint(0, len(lst)-1)]
 
+
+# -------------------------------- getters -----------------------------------#
 
 def get_location_by_name(name):
     '''
@@ -50,7 +51,6 @@ def get_location_by_tension(tension):
     Input: integer tension
     Output: list location(s)
     '''
-    print index(LOCATIONS, "Tension", unique=False)
     locations_on_tension = find_by_attribute(LOCATIONS, "Tension", tension)
     return rand(locations_on_tension)
 
@@ -106,14 +106,14 @@ def add_sentence(noun, adjective, nutsness=10):
 
     if randint(0, nuts) == 0:
         # return a ridiculous sentence
-        sentence = ' It is {}.'.format(
+        sentence = '. It is {}.'.format(
                                     referenced(
                                         adjective + drivel(n[-1])
                                         )
                                     )
     else:
         # return a boring sentence
-        sentence = ' This is a {} place.'.format(referenced(adjective))
+        sentence = '. This is a {} place'.format(referenced(adjective))
 
     return sentence
 
@@ -128,11 +128,11 @@ def add_location_props(loc):
     if type(loc) == str:
         loc = get_location_by_name(loc)
     props = loc['Props']
-    if props == ['']:
-        return '.'
+    if props == [''] or props == '':
+        return ''
     else:
         prop = rand(props)
-        return ' amongst the {}.'.format(pluralize(prop))
+        return ' amongst the {}'.format(pluralize(prop))
 
 
 def add_location_description(loc):
@@ -169,7 +169,7 @@ def add_location_discourse(text, location, add_props=False, add_descr=False):
     name = location['Location']
     preposition = location['Preposition']
     determiner = location['Determiner']
-    props = add_location_props(location) if add_props else '.'
+    props = add_location_props(location) if add_props else ''
     extra_simple_sentence = add_location_description(location) if add_descr else ''
     # return compiled text
     return "{0} {1} {2} {3}{4}{5}".format(
@@ -202,7 +202,7 @@ def generate_location_story(storyPart):
         add_props=props,
         add_descr=descr
         )
-    return (story_with_location, tension, descr)
+    return (story_with_location + '. ', tension, descr)
 
 
 if __name__ == "__main__":
