@@ -4,7 +4,7 @@ Let's generate a story, shall we?
 from random import randint
 
 from create_fabula import generate_story
-from discourse import generate_partial_story
+from discourse import generate_partial_story, introduction
 from discourse_locations import generate_location_story
 from discourse_connectors import get_connector
 
@@ -59,10 +59,12 @@ class Generator(object):
     def generate_partial(self):
         '''Create partial sentences from the framework'''
         story_length = len(self.frame_story)
-        for i in range(story_length):
+        for i in range(1, story_length):
             frame = self.frame_story[i]
             # check if last tuple
-            if i == story_length-1:
+            if i == 0:
+                frame = generate_partial_story(frame, isFirst=True)
+            elif i == story_length-1:
                 frame = generate_partial_story(frame, isLast=True)
             else:
                 frame = generate_partial_story(frame)
@@ -70,8 +72,13 @@ class Generator(object):
 
     def generate_embellish(self):
         '''Add rubbish to the key partial sentences'''
-        for e in self.partial_story:
+        story_length = len(self.partial_story)
+        for i in range(story_length):
             add_dot = True
+            e = self.partial_story[i]
+            if i == 0 or i == story_length:
+                self.embellished_story.append(e)
+                continue
             if die(LOCATION_ADDING) == 0:
                 add_dot = False
                 e = generate_location_story(e)
