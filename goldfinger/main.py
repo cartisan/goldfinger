@@ -17,7 +17,7 @@ except ImportError:
 
 
 # scale 1-10
-LOCATION_ADDING = 5
+LOCATION_ADDING = 4
 
 
 def die(i):
@@ -38,9 +38,12 @@ class Generator(object):
     embellished_story = []
     tension_arc = []
 
+    intro = ''
+    end = ''
+
     def __init__(self, storyName):
         self.storyName = storyName
-        self.frame_story = [] # FRAME IS A TRIPLE (String, int, String)
+        self.frame_story = [] # F IS A TRIPLE (String, int, String)
         self.partial_story = [] # P IS A TUPLE (String, int)
         self.embellished_story = [] # E IS A TUPLE (String, int)
 
@@ -59,18 +62,20 @@ class Generator(object):
     def generate_partial(self):
         '''Create partial sentences from the framework'''
         story_length = len(self.frame_story)
-        for i in range(1, story_length):
+        for i in range(0, story_length):
             frame = self.frame_story[i]
             # check if last tuple
             if i == 0:
-                self.partial_story.append(introduction(frame))
-                frame = generate_partial_story(frame, isFirst=True)
+                self.intro = introduction(frame)[0]
+                print self.intro
+                frame = generate_partial_story(frame)
             elif i == story_length-1:
+                self.end = ending(frame)[0]
+                print self.end
                 frame = generate_partial_story(frame, isLast=True)
             else:
                 frame = generate_partial_story(frame)
             self.partial_story.append(frame)
-        self.partial_story.append(ending(self.frame_story[story_length-1]))
 
     def generate_embellish(self):
         '''Add rubbish to the key partial sentences'''
@@ -78,9 +83,6 @@ class Generator(object):
         for i in range(story_length):
             add_dot = True
             e = self.partial_story[i]
-            if i == 0 or i == story_length:
-                self.embellished_story.append(e)
-                continue
             if die(LOCATION_ADDING) == 0:
                 add_dot = False
                 e = generate_location_story(e)
@@ -95,11 +97,14 @@ class Generator(object):
 
     def generate(self):
         self.generate_frame()
+        print 'FRAME'
         print self.frame_story
         self.generate_tension_arc()
         self.generate_partial()
+        print 'PARTIAL'
         print self.partial_story
         self.generate_embellish()
+        print 'EMBELLISHED'
         print self.embellished_story
         # export the story
         return self.export(self.embellished_story)
@@ -113,10 +118,11 @@ class Generator(object):
         '''
         f = open(self.storyName + '.txt', 'w')
         # compile
-        story = ''
+        story = self.intro
         for textComp in storyLst:
             text = textComp[0]
             story += text + " \n"
+        story += self.end
         f.write(story)
         return story
 
@@ -130,14 +136,14 @@ class Generator(object):
         axes = plt.gca()
         axes.set_ylim([0, 6])
         plt.title('Tension arc')
-        # plt.show()
+        plt.show()
 
 
 if __name__ == '__main__':
     '''
     Get this shit going!!
     '''
-    gen = Generator('FirstStory')
+    gen = Generator('fifth-story')
     gen.generate()
 
     # name = ''

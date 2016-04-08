@@ -23,7 +23,7 @@ import math
 from data import find_by_attribute, LOCATIONS
 
 
-NUTSNESS = 3
+NUTSNESS = 5
 
 
 def rand(lst):
@@ -104,9 +104,9 @@ def add_sentence(noun, adjective, nutsness=10):
     nuts = 10-nutsness
     n = noun.split()
 
-    if randint(0, nuts) == 0:
+    if randint(0, nuts) != 0:
         # return a ridiculous sentence
-        sentence = '. It is {}.'.format(
+        sentence = '. It is {}'.format(
                                     referenced(
                                         adjective + drivel(n[-1])
                                         )
@@ -202,7 +202,7 @@ def generate_location_story(storyPart):
         add_props=props,
         add_descr=descr
         )
-    return (story_with_location + '. ', tension, descr)
+    return (story_with_location + '. ', tension)
 
 
 if __name__ == "__main__":
