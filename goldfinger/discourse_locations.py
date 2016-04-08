@@ -22,15 +22,16 @@ import math
 
 from data import find_by_attribute, LOCATIONS
 
+
 NUTSNESS = 10
 
-
-# -------------------------------- getters -----------------------------------#
 
 def rand(lst):
     '''Get random element from a list'''
     return lst[randint(0, len(lst)-1)]
 
+
+# -------------------------------- getters -----------------------------------#
 
 def get_location_by_name(name):
     '''

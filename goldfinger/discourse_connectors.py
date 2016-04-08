@@ -4,6 +4,8 @@ Defines functions that return connector sentences based on tension level.
 from discourse_locations import rand
 
 
+DISCOURSE_CONNECTORS = ['but', 'and', 'so', 'yet']
+
 CLIMAX_CONNECTORS = [
                 ' However, ',
                 ' Nonewithstanding, ',
@@ -18,7 +20,7 @@ CLIMAX_FINALISERS = [
                 ' Good story. '
                 ]
 RANDOM_CONNECTORS = [
-                ' Anyway, ',
+                " Anyway, ",
                 " Now without further beating around the bush, ",
                 " Now let us resume our story. ",
                 " No intention of wandering off, so ",
@@ -31,9 +33,8 @@ def get_connector(textTriple):
     # add connector according to available description
     if tension == '5.0':
         # prepend the connector
-        text = text[0].lower() + text[1:]
         text = rand(CLIMAX_CONNECTORS) + text + rand(CLIMAX_FINALISERS)
-    else:
+    elif not any(text.endswith(c) for c in DISCOURSE_CONNECTORS):
         # append the connector
         text = text + rand(RANDOM_CONNECTORS)
-    return text
+    return (text, tension)
