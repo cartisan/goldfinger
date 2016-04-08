@@ -89,6 +89,18 @@ def conjunction(tuplestory):
 
 print(conjunction(('are_rewarded_with', '2.0', 'take_advantage_of')))
 
+# 6. Make characters
+
+def make_characters():
+	number = len(NOC)
+	char_i1 = randint(0, number)
+	char_i2 = randint(0, number)
+	firstchar = NOC[char_i1]['Character']
+	secondchar = NOC[char_i2]['Character']
+
+	return (firstchar, secondchar)
+
+print(make_characters())
 
 # TUPLES GENERATION: PHASE 1
 
@@ -118,14 +130,14 @@ def generate_partial_story(tuplestory, isLast=False):
 			return tuple(idiom, intensity)
 		"""
 		make_characters()
-		return (idiom1.replace("A", FIRST_CHAR).replace("B", SECOND_CHAR), intensity)
+		return (idiom1, intensity)
 
 
 def introduction(firsttuple):
 	verb1 = firsttuple[0]
 	intensity = firsttuple[1]
 	intro = dice( csv_search("cc_pattern/Veale's initial bookend actions.txt", "Establishing Action", verb1) )
-	return ((str(intro.replace("A", FIRST_CHAR).replace("B", SECOND_CHAR) + ". ")),(intensity) )
+	return ((str(intro + ". ")),(intensity) )
 
 print(introduction(('are_worshipped_by', '2.0', 'condescend_to')))
 
