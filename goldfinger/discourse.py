@@ -88,15 +88,17 @@ def conjunction(tuplestory):
 
 print(conjunction(('are_rewarded_with', '2.0', 'take_advantage_of')))
 
+
 # 6. Replace A and B by characters:
 
+#def character(idiom):
 
 
 
 
 # TUPLES GENERATION: PHASE 1
 
-def generate_partial_story(tuplestory, islast=False):
+def generate_partial_story(tuplestory, L=False):
 	verb1 = tuplestory[0]
 	verb2 = tuplestory[2]
 	intensity = tuplestory[1]
@@ -124,25 +126,40 @@ def generate_partial_story(tuplestory, islast=False):
 		return (idiom1, intensity)
 
 
-def introduction(firsttuple):
-	verb1 = firsttuple[0]
-	intro = dice( csv_search("cc_pattern/Veale's initial bookend actions.txt", "Establishing Action", verb1) )
-	return str(intro + ". ")
+def introduction(firsttuple, F=False):
+
+	if F:
+		verb1 = firsttuple[0]
+		intensity = firsttuple[1]
+		intro = dice( csv_search("cc_pattern/Veale's initial bookend actions.txt", "Establishing Action", verb1) )
+		return ((str(intro + ". ")),(intensity) )
 
 print(introduction(('are_worshipped_by', '2.0', 'condescend_to')))
+
+
+def ending(lasttuple):
+	verb = lasttuple[2]
+	ending = dice( csv_search("cc_pattern/Veale's closing bookend actions.txt", "Closing Action", verb) )
+	ending = ending.replace('\"', "")
+	ending[0].upper()
+	return str(ending + ". ")
+
+print(ending(('trust', '3.0', 'are_abducted_by')))
+
 
 
 
 # TRYOUT
 
 
+
+
+
+
 """
 for sentence in story:
 	print(generate_partial_story(sentence))
 """
-
-
-
 
 
 
