@@ -156,7 +156,7 @@ def replacefunction(text, firstchar, secondchar):
 	regex1 = re.compile(r'(\b)A(\b)')
 	regex2 = re.compile(r'(\b)B(\b)')
 	newtext = re.sub(regex1, firstchar, text)
-	newtext = re.sub(regex1, secondchar, text)
+	newtext = re.sub(regex2, secondchar, text)
 
 	return newtext
 
