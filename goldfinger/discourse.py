@@ -80,10 +80,19 @@ def conjunction(tuplestory):
 	with open("cc_pattern/Veale's action pairs.txt", 'rt') as f:
 		data = f.read()
 	datalines = data.split("\n")
-	for row in datalines:
-		if ( row[1] == verb1 and row[3] == verb2 ):
+	for line in datalines:
+		row = line.split(";")
+		if  row[1] == verb1 and row[3] == verb2 :
 			conj = row[2]
-			return conj
+	return conj
+
+print(conjunction(('are_rewarded_with', '2.0', 'take_advantage_of')))
+
+# 6. Replace A and B by characters:
+
+
+
+
 
 # TUPLES GENERATION: PHASE 1
 
@@ -117,8 +126,11 @@ def generate_partial_story(tuplestory, islast=False):
 
 # TRYOUT
 
+
+
 for sentence in story:
 	print(generate_partial_story(sentence))
+
 
 
 
