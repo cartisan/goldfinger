@@ -23,8 +23,6 @@ def csv_search(filename, columnheader, rowheader):
 		if i == rowindex:
 			return line.split(";")[columnindex]
 
-idiom = csv_search("cc_pattern/Veale's idiomatic actions.txt", "Idiomatic Forms", "disappoint")
-
 
 # 2. Search an element in the NOC-data with the corresponding columnheader and rowheader
 
@@ -71,9 +69,61 @@ def superlative(adjective):
 print(superlative("grand"))
 
 story = generate_story()
+print(story)
 
 
-#superlative = tsv_search()
+# 5. Insert conjunctions between two verbs
+
+def conjunction(tuplestory):
+	verb1 = tuplestory[0]
+	verb2 = tuplestory[2]
+	with open("cc_pattern/Veale's action pairs.txt", 'rt') as f:
+		data = f.read()
+	datalines = data.split("\n")
+	for row in datalines:
+		if ( row[1] == verb1 and row[3] == verb2 ):
+			conj = row[2]
+			return conj
+
+# TUPLES GENERATION: PHASE 1
+
+def generate_partial_story(tuplestory, islast=False):
+	verb1 = tuplestory[0]
+	verb2 = tuplestory[2]
+	intensity = tuplestory[1]
+	conj = conjunction(tuplestory)
+	idiom1 = dice( csv_search("cc_pattern/Veale's idiomatic actions.txt", "Idiomatic Forms", verb1) )
+	idiom2 = dice( csv_search("cc_pattern/Veale's idiomatic actions.txt", "Idiomatic Forms", verb2) )
+
+	if islast:
+		if conj == "and":
+			return (str(idiom1) + " " + conj  + " " + str(idiom2), intensity)
+		else: 
+			return (str(idiom1) + ", " + conj  + " " + str(idiom2), intensity)
+	else:
+		"""
+		conj = conjunction(tuplestory)
+		dice = randint(0, 2)
+		if dice == 1:
+			if conj == "and":
+				return tuple(str(idiom) + " " + conj  , intensity)
+			else: 
+				return tuple(str(idiom) + ", " + conj  , intensity)
+		else:
+			return tuple(idiom, intensity)
+		"""
+		return (idiom1, intensity)
+
+
+# TRYOUT
+
+for sentence in story:
+	print(generate_partial_story(sentence))
+
+
+
+
+
 
 
 """
