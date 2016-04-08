@@ -14,21 +14,13 @@ roomette in which things are stored."
 
 '''
 from random import randint
-
-from cc_pattern.drivel import drivel
-# from cc_pattern.noc import index
-from pattern.en import pluralize, sentiment, referenced
 import math
 
+from cc_pattern.drivel import drivel
+from pattern.en import pluralize, sentiment, referenced
+
 from data import find_by_attribute, LOCATIONS
-
-
-NUTSNESS = 5
-
-
-def rand(lst):
-    '''Get random element from a list'''
-    return lst[randint(0, len(lst)-1)]
+from discourse.core import rand, NUTSNESS
 
 
 # -------------------------------- getters -----------------------------------#
@@ -83,7 +75,6 @@ def estimate_location_tension():
         s[1] /= len(ambience)
         total_tension = s[0]+s[1]
         tensions.append(total_tension)
-        # tensions.append(str(s[0]+s[1]) + "; " + str(s[0]) + ', ' + str(s[1]) + ' ' + repr(location['Location']) + '\n')
     maxt = max(tensions)
     mint = min(tensions)
     for t in tensions:
@@ -193,7 +184,6 @@ def generate_location_story(storyPart):
     '''
     sentence, tension = storyPart
     location = get_location_by_tension(tension)
-    # location = get_location_at_random()
     props = True
     descr = bool(randint(0, NUTSNESS) != 0)
     story_with_location = add_location_discourse(
@@ -203,15 +193,3 @@ def generate_location_story(storyPart):
         add_descr=descr
         )
     return (story_with_location + '. ', tension)
-
-
-if __name__ == "__main__":
-    # for testing
-    print add_location_discourse(
-        "He was killed",
-        "changing room",
-        add_props=True,
-        add_descr=True
-        )
-
-    print generate_location_story(("The little pony was enflowered", "5.0"))

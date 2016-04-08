@@ -3,10 +3,11 @@ Let's generate a story, shall we?
 '''
 from random import randint
 
-from create_fabula import generate_story
-from discourse import generate_partial_story, introduction, ending, make_characters, replacefunction
-from discourse_locations import generate_location_story
-from discourse_connectors import get_connector
+from fabula.create_fabula import generate_story
+from discourse.core import generate_partial_story, introduction, ending
+from discourse.characters import make_characters, replacefunction
+from discourse.locations import generate_location_story
+from discourse.connectors import get_connector
 
 try:
     import numpy as np
@@ -17,14 +18,14 @@ except ImportError:
 
 
 # scale 1-10
-LOCATION_ADDING = 4
+LOCATION_ADDING = 3
 
 
 def die(i):
     return randint(0, i)
 
 
-class Generator(object):
+class StoryGenerator(object):
     '''
     Generate and embellish a story.
 
@@ -33,6 +34,7 @@ class Generator(object):
         with the text.
     '''
     storyName = ''
+    story = ''
     frame_story = []
     partial_story = []
     embellished_story = []
@@ -43,9 +45,29 @@ class Generator(object):
 
     def __init__(self, storyName):
         self.storyName = storyName
+        self.story = ''
         self.frame_story = [] # F IS A TRIPLE (String, int, String)
         self.partial_story = [] # P IS A TUPLE (String, int)
         self.embellished_story = [] # E IS A TUPLE (String, int)
+
+    def generate(self):
+        '''Perform the actual generation'''
+        self.generate_frame()
+        self.generate_partial()
+        self.generate_embellish()
+        # export the story
+        self.export(self.embellished_story)
+
+        print 'FRAME'
+        print self.frame_story
+        print 'PARTIAL'
+        print self.partial_story
+        print 'EMBELLISHED'
+        print self.embellished_story
+        print 'STORY'
+        print self.story
+        print 'TENSION ARC'
+        self.generate_tension_arc()
 
     def generate_frame(self):
         '''Generate skeleton'''
@@ -64,7 +86,6 @@ class Generator(object):
         story_length = len(self.frame_story)
         for i in range(0, story_length):
             frame = self.frame_story[i]
-            # check if last tuple
             if i == 0:
                 self.intro = introduction(frame)[0]
                 print self.intro
@@ -95,20 +116,6 @@ class Generator(object):
                 e = (text + '. ', tension)
             self.embellished_story.append(e)
 
-    def generate(self):
-        self.generate_frame()
-        print 'FRAME'
-        print self.frame_story
-        self.generate_tension_arc()
-        self.generate_partial()
-        print 'PARTIAL'
-        print self.partial_story
-        self.generate_embellish()
-        print 'EMBELLISHED'
-        print self.embellished_story
-        # export the story
-        return self.export(self.embellished_story)
-
     def export(self, storyLst):
         '''
         Compile the story into a text.
@@ -118,15 +125,14 @@ class Generator(object):
         '''
         f = open(self.storyName + '.txt', 'w')
         # compile
-        story = self.intro
+        self.story = self.intro
         for textComp in storyLst:
             text = textComp[0]
-            story += text + " \n"
-        story += self.end
-        char1, char2 = make_characters()
-        replacefunction(story, char1, char2)
-        f.write(story)
-        return story
+            self.story += text + " \n"
+        self.story += self.end
+        [char1, char2] = make_characters(2)
+        self.story = replacefunction(self.story, char1, char2)
+        f.write(self.story)
 
     def make_plot(self):
         # plot the tension arc
@@ -145,9 +151,5 @@ if __name__ == '__main__':
     '''
     Get this shit going!!
     '''
-    gen = Generator('fifth-story')
+    gen = StoryGenerator('example_stories/seventh-story')
     gen.generate()
-
-    # name = ''
-    # gen = Generator(name)
-    # gen.generate()

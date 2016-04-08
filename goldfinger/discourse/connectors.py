@@ -1,10 +1,8 @@
 '''
 Defines functions that return connector sentences based on tension level.
 '''
-from discourse_locations import rand
+from discourse.core import rand
 
-
-DISCOURSE_CONNECTORS = ['but', 'and', 'so', 'yet']
 
 CLIMAX_CONNECTORS = [
                 ' However, ',
@@ -37,9 +35,6 @@ def get_connector(textContent):
     if tension == '5.0':
         # prepend the connector
         text = rand(CLIMAX_CONNECTORS) + text + rand(CLIMAX_FINALISERS)
-    # elif not any(text.endswith(c) for c in DISCOURSE_CONNECTORS):
-    #     # append the connector
-    #     text = text + rand(RANDOM_CONNECTORS)
     elif '.' not in text:
         text = text + '. '
     return (text, tension)

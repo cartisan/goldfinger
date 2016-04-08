@@ -98,3 +98,51 @@ class Person(Row):
         that can be used as mate for this char.
         """
         pass
+
+
+# -------------------- csv/tsv searches on raw data files ------------------- #
+
+# 1. Search an element in the Scalextric CSV-converted data with the
+# corresponding columnheader and rowheader
+
+def csv_search(filename, columnheader, rowheader):
+    with open(filename, 'rt') as f:
+        data = f.read()
+    datalines = data.split("\n")
+
+    # columnheaders
+    columnheaders = datalines[0].split(";")
+    columnindex = columnheaders.index(columnheader)
+
+    # rowheaders
+    rowheaders = []
+    for line in datalines:
+        row = line.split(";")
+        rowheaders.append(row[0])
+    rowindex = rowheaders.index(rowheader)
+    for i, line in enumerate(datalines):
+        if i == rowindex:
+            return line.split(";")[columnindex]
+
+
+# 2. Search an element in the NOC-data with the corresponding columnheader
+# and rowheader
+
+def tsv_search(filename, columnheader, rowheader):
+    with open(filename, 'rt') as f:
+        data = f.read()
+    datalines = data.split("\n")
+
+    # columnheaders
+    columnheaders = datalines[0].split("\t")
+    columnindex = columnheaders.index(columnheader)
+
+    # rowheaders
+    rowheaders = []
+    for line in datalines:
+        row = line.split("\t")
+        rowheaders.append(row[0])
+    rowindex = rowheaders.index(rowheader)
+    for i, line in enumerate(datalines):
+        if i == rowindex:
+            return line.split("\t")[columnindex]
