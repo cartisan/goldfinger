@@ -124,12 +124,22 @@ def generate_partial_story(tuplestory, islast=False):
 		return (idiom1, intensity)
 
 
+def introduction(firsttuple):
+	verb1 = firsttuple[0]
+	intro = dice( csv_search("cc_pattern/Veale's initial bookend actions.txt", "Establishing Action", verb1) )
+	return str(intro + ". ")
+
+print(introduction(('are_worshipped_by', '2.0', 'condescend_to')))
+
+
+
 # TRYOUT
 
 
-
+"""
 for sentence in story:
 	print(generate_partial_story(sentence))
+"""
 
 
 
