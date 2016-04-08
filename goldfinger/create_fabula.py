@@ -7,6 +7,7 @@ from data import ACTION_PAIRS, MIDPOINTS
 from data import find_by_attribute
 
 CONF_PROB = {5: 0.6, 4: 0.3, 3: 0.1}
+CONF_PROB = {5: 1}
 NUM_OF_CLIMAXES = len(find_by_attribute(ACTION_PAIRS, "Tension", "5.0"))
 
 # datatypes:
