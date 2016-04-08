@@ -89,28 +89,8 @@ def conjunction(tuplestory):
 
 print(conjunction(('are_rewarded_with', '2.0', 'take_advantage_of')))
 
-FIRST_CHAR = ''
-SECOND_CHAR = ''
-
-
-# 6. Make characters
-
-def make_characters():
-	number = 804
-	char_i1 = randint(0, number)
-	char_i2 = randint(0, number)
-	FIRST_CHAR += NOC[char_i1]['Character']
-	SECOND_CHAR += NOC[char_i2]['Character']
-
-make_characters()
-print(FIRST_CHAR)
-
-
-
 
 # TUPLES GENERATION: PHASE 1
-
-
 
 def generate_partial_story(tuplestory, isLast=False):
 	verb1 = tuplestory[0]
@@ -159,3 +139,17 @@ def ending(lasttuple):
 	return ((str(ending + ". "), (intensity) ))
 
 print(ending(('trust', '3.0', 'are_abducted_by')))
+
+def replacefunction(text, firstchar, secondchar):
+	regex1 = re.compile(r'(\b)A(\b)')
+	regex2 = re.compile(r'(\b)B(\b)')
+	newtext = re.sub(regex1, firstchar, text)
+	newtext = re.sub(regex1, secondchar, text)
+
+	return newtext
+
+
+
+
+
+
