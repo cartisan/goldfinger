@@ -16,7 +16,7 @@ roomette in which things are stored."
 from random import randint
 
 from cc_pattern.drivel import drivel
-from cc_pattern.noc import index
+# from cc_pattern.noc import index
 from pattern.en import pluralize, sentiment, referenced
 import math
 
@@ -50,7 +50,6 @@ def get_location_by_tension(tension):
     Input: integer tension
     Output: list location(s)
     '''
-    print index(LOCATIONS, "Tension", unique=False)
     locations_on_tension = find_by_attribute(LOCATIONS, "Tension", tension)
     return rand(locations_on_tension)
 
@@ -128,7 +127,7 @@ def add_location_props(loc):
     if type(loc) == str:
         loc = get_location_by_name(loc)
     props = loc['Props']
-    if props == ['']:
+    if props == [''] or props == '':
         return '.'
     else:
         prop = rand(props)

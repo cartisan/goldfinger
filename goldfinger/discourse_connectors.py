@@ -32,7 +32,8 @@ def get_connector(textTriple):
     if tension == '5.0':
         # prepend the connector
         text = text[0].lower() + text[1:]
-        text = rand(CLIMAX_CONNECTORS) + text
-    # append the connector
-    text = text + rand(RANDOM_CONNECTORS)
+        text = rand(CLIMAX_CONNECTORS) + text + rand(CLIMAX_FINALISERS)
+    else:
+        # append the connector
+        text = text + rand(RANDOM_CONNECTORS)
     return text
