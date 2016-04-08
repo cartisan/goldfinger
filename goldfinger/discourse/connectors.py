@@ -1,7 +1,7 @@
 '''
 Defines functions that return connector sentences based on tension level.
 '''
-from discourse.core import rand
+from helpers import rand
 
 
 CLIMAX_CONNECTORS = [

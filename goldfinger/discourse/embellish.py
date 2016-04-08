@@ -8,5 +8,6 @@ def embellish(sentence):
         if 'NN' in i:
             word = i[0]
             return sentence.replace(word, drivel(word)[2:])
+    return sentence
 
 print embellish("He that becomes a god.")

@@ -1,25 +1,21 @@
-from random import randint
-
 from data import csv_search, find_by_attribute, ACTION_PAIRS
+from discourse.embellish import embellish
+from helpers import dice, die
 
 
-NUTSNESS = 7
-
-
-def rand(lst):
-    '''Get random element from a list'''
-    return lst[randint(0, len(lst)-1)]
-
-
-def dice(commastring):
-    '''Randomly get an element from comma-separated list'''
-    commalist = commastring.split(", ")
-    return rand(commalist)
+NUTSNESS = 6
 
 
 def sanitise(text):
     # text = text.replace('\"', '') # this also replaces dialogue quotes!
     return text
+
+
+def edit(text):
+    '''Perform changes on the text'''
+    if die(10-NUTSNESS) != 0:
+        text = embellish(text)
+    return sanitise(str(text))
 
 
 # --------------------------------- story components ------------------------#
@@ -37,31 +33,31 @@ def generate_partial_story(actionPair, isLast=False):
     verb, tension, verb2 = actionPair
     idiom = dice(csv_search("cc_pattern/Veale's idiomatic actions.txt", "Idiomatic Forms", verb))
     if not isLast:
-        return (sanitise(idiom), tension)
+        return (edit(idiom), tension)
     else:
         # compose conjunction for last action pair
         conj = conjunction(actionPair)
         idiom2 = dice(csv_search("cc_pattern/Veale's idiomatic actions.txt", "Idiomatic Forms", verb2))
         if conj == "and":
             sentence = '{0} {1} {2}'.format(idiom, conj, idiom2)
-            return (sanitise(sentence), tension)
+            return (edit(sentence), tension)
         else:
             sentence = '{0}, {1} {2}'.format(idiom, conj, idiom2)
-            return (sanitise(sentence), tension)
+            return (edit(sentence), tension)
 
 
 def introduction(actionPair):
     verb, tension, verb2 = actionPair
     intro = dice(csv_search("cc_pattern/Veale's initial bookend actions.txt", "Establishing Action", verb))
     intro = intro[0].upper() + intro[1:]
-    return (sanitise(intro) + ". ", tension)
+    return (edit(intro) + ". ", tension)
 
 
 def ending(actionPair):
     verb, tension, verb2 = actionPair
     ending = dice(csv_search("cc_pattern/Veale's closing bookend actions.txt", "Closing Action", verb))
     ending = ending[0].upper() + ending[1:] if ending else ending
-    return (sanitise(ending) + ". ", tension)
+    return (edit(ending) + ". ", tension)
 
 
 # ------------------------------ discourse components ------------------------#

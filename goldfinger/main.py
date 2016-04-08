@@ -1,8 +1,7 @@
 '''
 Let's generate a story, shall we?
 '''
-from random import randint
-
+from helpers import die
 from fabula.create_fabula import generate_story
 from discourse.core import generate_partial_story, introduction, ending
 from discourse.characters import make_characters, replacefunction
@@ -19,10 +18,6 @@ except ImportError:
 
 # scale 1-10
 LOCATION_ADDING = 3
-
-
-def die(i):
-    return randint(0, i)
 
 
 class StoryGenerator(object):
@@ -151,5 +146,5 @@ if __name__ == '__main__':
     '''
     Get this shit going!!
     '''
-    gen = StoryGenerator('example_stories/seventh-story')
+    gen = StoryGenerator('example_stories/9')
     gen.generate()

@@ -1,7 +1,7 @@
 import re
 
 from data import NOC
-from discourse.core import rand
+from helpers import rand
 
 
 def make_characters(n):

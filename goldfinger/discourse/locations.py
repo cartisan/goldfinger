@@ -20,7 +20,8 @@ from cc_pattern.drivel import drivel
 from pattern.en import pluralize, sentiment, referenced
 
 from data import find_by_attribute, LOCATIONS
-from discourse.core import rand, NUTSNESS
+from helpers import rand
+from discourse.core import NUTSNESS
 
 
 # -------------------------------- getters -----------------------------------#
