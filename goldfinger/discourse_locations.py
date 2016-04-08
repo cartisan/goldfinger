@@ -192,8 +192,8 @@ def generate_location_story(storyPart):
     Output: tuple (storySentence+location, tensionLevel, bool has_descr)
     '''
     sentence, tension = storyPart
-    # location = get_location_by_tension(tension)
-    location = get_location_at_random()
+    location = get_location_by_tension(tension)
+    # location = get_location_at_random()
     props = True
     descr = bool(randint(0, NUTSNESS) != 0)
     story_with_location = add_location_discourse(
