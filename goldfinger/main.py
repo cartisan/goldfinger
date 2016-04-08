@@ -4,7 +4,7 @@ Let's generate a story, shall we?
 from random import randint
 
 from create_fabula import generate_story
-from discourse import generate_partial_story, introduction, ending
+from discourse import generate_partial_story, introduction, ending, make_characters
 from discourse_locations import generate_location_story
 from discourse_connectors import get_connector
 
@@ -80,6 +80,7 @@ class Generator(object):
     def generate_embellish(self):
         '''Add rubbish to the key partial sentences'''
         story_length = len(self.partial_story)
+        char1, char2 = make_characters()
         for i in range(story_length):
             add_dot = True
             e = self.partial_story[i]
