@@ -1,6 +1,7 @@
 from create_fabula import generate_story
 from random import randint
 import re
+from data import NOC
 
 # 1. Search an element in the Scalextric CSV-converted data with the corresponding columnheader and rowheader
 
@@ -89,14 +90,6 @@ def conjunction(tuplestory):
 print(conjunction(('are_rewarded_with', '2.0', 'take_advantage_of')))
 
 
-# 6. Replace A and B by characters:
-
-#def make_characters():
-
-
-
-
-
 # TUPLES GENERATION: PHASE 1
 
 def generate_partial_story(tuplestory, isLast=False):
@@ -107,7 +100,7 @@ def generate_partial_story(tuplestory, isLast=False):
 	idiom1 = dice( csv_search("cc_pattern/Veale's idiomatic actions.txt", "Idiomatic Forms", verb1) )
 	idiom2 = dice( csv_search("cc_pattern/Veale's idiomatic actions.txt", "Idiomatic Forms", verb2) )
 
-	if islast:
+	if isLast:
 		if conj == "and":
 			return (str(idiom1) + " " + conj  + " " + str(idiom2), intensity)
 		else: 
@@ -124,15 +117,15 @@ def generate_partial_story(tuplestory, isLast=False):
 		else:
 			return tuple(idiom, intensity)
 		"""
-		return (idiom1, intensity)
+		make_characters()
+		return (idiom1.replace("A", FIRST_CHAR).replace("B", SECOND_CHAR), intensity)
 
 
 def introduction(firsttuple):
-
 	verb1 = firsttuple[0]
 	intensity = firsttuple[1]
 	intro = dice( csv_search("cc_pattern/Veale's initial bookend actions.txt", "Establishing Action", verb1) )
-	return ((str(intro + ". ")),(intensity) )
+	return ((str(intro.replace("A", FIRST_CHAR).replace("B", SECOND_CHAR) + ". ")),(intensity) )
 
 print(introduction(('are_worshipped_by', '2.0', 'condescend_to')))
 
@@ -142,45 +135,20 @@ def ending(lasttuple):
 	intensity = lasttuple[1]
 	ending = dice( csv_search("cc_pattern/Veale's closing bookend actions.txt", "Closing Action", verb) )
 	ending = ending.replace('\"', "")
-	ending[0].upper()
+	ending = ending[0].upper() + ending[1:]
 	return ((str(ending + ". "), (intensity) ))
 
 print(ending(('trust', '3.0', 'are_abducted_by')))
 
+def replacefunction(text, firstchar, secondchar):
+	regex1 = re.compile(r'(\b)A(\b)')
+	regex2 = re.compile(r'(\b)B(\b)')
+	newtext = re.sub(regex1, firstchar, text)
+	newtext = re.sub(regex1, secondchar, text)
+
+	return newtext
 
 
-
-# TRYOUT
-
-
-
-
-
-
-"""
-for sentence in story:
-	print(generate_partial_story(sentence))
-"""
-
-
-
-
-
-"""
-chosen_idiom = dice(idiom)
-print(chosen_idiom)
-
-idiomlist = ['spy_on', 'are_discovered_by', 'beg_forgiveness_from', 'are_killed_by', 'haunt', 'are_exorcized_by']
-
-story = []
-
-for idiom in idiomlist: 
-	story.append(csv_search("Veale's idiomatic actions.txt", "Idiomatic Forms", idiom))
-
-
-print(". ".join(story))
-
-"""
 
 
 
