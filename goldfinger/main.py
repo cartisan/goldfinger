@@ -17,7 +17,7 @@ except ImportError:
 
 
 # scale 1-10
-LOCATION_ADDING = 1
+LOCATION_ADDING = 5
 
 
 def die(i):
@@ -41,7 +41,7 @@ class Generator(object):
     def __init__(self, storyName):
         self.storyName = storyName
         self.frame_story = [] # FRAME IS A TRIPLE (String, int, String)
-        self.partial_story = []
+        self.partial_story = [] # P IS A TUPLE (String, int)
         self.embellished_story = [] # E IS A TUPLE (String, int)
 
     def generate_frame(self):
@@ -71,10 +71,17 @@ class Generator(object):
     def generate_embellish(self):
         '''Add rubbish to the key partial sentences'''
         for e in self.partial_story:
+            add_dot = True
             if die(LOCATION_ADDING) == 0:
+                add_dot = False
                 e = generate_location_story(e)
             if die(LOCATION_ADDING) == 0:
+                add_dot = False
                 e = get_connector(e)
+            if add_dot:
+                text = e[0]
+                tension = e[1]
+                e = (text + '. ', tension)
             self.embellished_story.append(e)
 
     def generate(self):
@@ -114,7 +121,7 @@ class Generator(object):
         axes = plt.gca()
         axes.set_ylim([0, 6])
         plt.title('Tension arc')
-        plt.show()
+        return plt.show()
 
 
 if __name__ == '__main__':

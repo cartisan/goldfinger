@@ -23,8 +23,8 @@ RANDOM_CONNECTORS = [
                 " Anyway, ",
                 " Now without further beating around the bush, ",
                 " Now let us resume our story. ",
-                " No intention of wandering off, so ",
-                " Would you believe it if I told you that "
+                " No intention of wandering off, so let's proceed. ",
+                " Would you believe it if I told you the following: "
                 ]
 
 
@@ -37,7 +37,9 @@ def get_connector(textContent):
     if tension == '5.0':
         # prepend the connector
         text = rand(CLIMAX_CONNECTORS) + text + rand(CLIMAX_FINALISERS)
-    elif not any(text.endswith(c) for c in DISCOURSE_CONNECTORS):
-        # append the connector
-        text = text + rand(RANDOM_CONNECTORS)
+    # elif not any(text.endswith(c) for c in DISCOURSE_CONNECTORS):
+    #     # append the connector
+    #     text = text + rand(RANDOM_CONNECTORS)
+    elif '.' not in text:
+        text = text + '. '
     return (text, tension)
