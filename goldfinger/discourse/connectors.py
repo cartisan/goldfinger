@@ -13,9 +13,9 @@ CLIMAX_CONNECTORS = [
                 ' Still, ',
                 ]
 CLIMAX_FINALISERS = [
-                '. Horrible. ',
-                '. Definitely not cool. ',
-                '. Good story. '
+                ' Horrible. ',
+                ' Definitely not cool. ',
+                ' Good story. '
                 ]
 RANDOM_CONNECTORS = [
                 " Anyway, ",
