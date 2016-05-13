@@ -1,10 +1,11 @@
 import collections
 from pprint import pprint
-from random import randint, choice
 import logging
+from random import choice
 
 from data import ACTION_PAIRS, MIDPOINTS
 from data import find_by_attribute
+from helpers import choice_from_rest
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -64,7 +65,7 @@ def find_previous_steps(action, tension):
     ]
     """
 
-    logging.info("Finding previous midpoint for " + str(action))
+    logging.debug("Finding previous midpoint for " + str(action))
     after_midpoint = action[0]
     try:
         midpoints = find_by_attribute(MIDPOINTS,
@@ -77,7 +78,6 @@ def find_previous_steps(action, tension):
 
     # transform (BefM, M, AftM) to [((BefM, rating, M)), (M, rating, AftM)]
     ap_tuples = []
-    import pdb; pdb.set_trace()
     for mp in midpoints:
         ap_tuple = midpoint_to_actionpairs(mp)
         if ap_tuple:
@@ -86,9 +86,11 @@ def find_previous_steps(action, tension):
 
 
 def create_story_graph_back(tension_curve):
+    logger.info(
+        "Backwards generating story graph from tension " + tension_curve[2]
+    )
     story_graph = Tree()
 
-    logger.info("Finding climaxes with tension " + tension_curve[2])
     climaxes = find_by_attribute(ACTION_PAIRS, "Tension", tension_curve[2])
     logger.debug(str(len(climaxes)) + " climaxes found")
 
@@ -97,6 +99,7 @@ def create_story_graph_back(tension_curve):
         story_graph[tension_curve[2]][action_pair]
 
     # TODO: remove restriction of used climax
+    # for action_pair in story_graph[tension_curve[2]].keys()[3:4]:
     for action_pair in story_graph[tension_curve[2]].keys()[2:3]:
         previous_steps = find_previous_steps(action_pair, tension_curve[1])
         for (BefMM, MAftM) in previous_steps:
@@ -134,49 +137,78 @@ def find_story(story_graph, tension_curve):
     logger.info("Starting story generation: {}".format(tension_curve))
     tension1, tension2, tension3 = tension_curve[2], tension_curve[1], tension_curve[0]
 
+    # ================================================================
     ap1 = None
+    used_ap1 = []
     prev_events_ratings = None
-    i = 0
-    while not prev_events_ratings:
-        ap1 = choice(story_graph[tension1].keys())
-        prev_events_ratings = story_graph[tension1][ap1].keys()
-        i += 1
-        if i > 500:
-            message = "No story can be found with 3rd tension, available: {}"\
-                .format(story_graph.keys())
-            raise Exception(message)
+    possible_prev_ratings = set([])
+    while True:
+        try:
+            ap1, used_ap1 = choice_from_rest(story_graph[tension1].keys(),
+                                             used_ap1)
+        except IndexError:
+            # tried all possible ap1
+            message = "No further story could be found with 2nd tension: {}, available: {}"\
+                .format(tension2, possible_prev_ratings)
+            logging.warning(message)
+            break
 
-    logger.debug("Chosen climax: {}".format(ap1))
-    logger.debug("Ratings available for back planing: {}\n".
-                 format(prev_events_ratings))
+        ap1_node = story_graph[tension1][ap1]
+        prev_events_ratings = ap1_node.keys()
 
-    ap2 = None
-    prev_events_ratings = None
-    i = 0
-    while not prev_events_ratings:
-        ap2 = choice(story_graph[tension1][ap1][tension2].keys())
-        prev_events_ratings = story_graph[tension1][ap1][tension2][ap2].keys()
-        if i > 500:
-            message = "No story can be found with 2nd tension, available: {}"\
-                .format(story_graph[tension1][ap1].keys())
-            raise Exception(message)
+        if tension2 not in prev_events_ratings:
+            possible_prev_ratings |= set(prev_events_ratings)
+            prev_events_ratings = []
+            continue
 
-    print ap2
-    print prev_events_ratings
-    print
+        logger.debug("Chosen final ap: {}".format(ap1))
+        logger.debug("Ratings available for back planing: {}".
+                     format(prev_events_ratings))
 
-    try:
-        ap3 = choice(story_graph[tension1][ap1][tension2][ap2][tension3].keys())
-    except IndexError:
-        message = "No story can be found with 1st tension {}, available: {}"\
-            .format(tension3, story_graph[tension1][ap1][tension2][ap2].keys())
-        raise Exception(message)
+        # ================================================================
+        ap2 = None
+        used_ap2 = []
+        prev_events_ratings2 = None
+        possible_prev_ratings2 = set([])
+        while True:
+            try:
+                ap2, used_ap2 = choice_from_rest(ap1_node[tension2].keys(),
+                                                 used_ap2)
+            except IndexError:
+                # chosen ap1 doesn't lead to ap2 that have tension3 available
+                # break out and jump to continue, that leads to next ap1 choice
+                message = "  No ap2 could be found from final ap {} leading to "\
+                          .format(ap1) +\
+                          "3rd tension: {}, but ap2s were found leading to 3rd "\
+                          .format(tension3) +\
+                          "tensions: {}".format(possible_prev_ratings2)
+                logging.warning(message)
+                break
 
-    print ap3
-    return [ap3, ap2, ap1]
+            ap2_node = ap1_node[tension2][ap2]
+            prev_events_ratings2 = ap2_node.keys()
 
+            if tension3 not in prev_events_ratings2:
+                possible_prev_ratings2 |= set(prev_events_ratings2)
+                prev_events_ratings2 = []
+                continue
 
-tension_curve = ["3.0", "3.0", "5.0"]
+            logger.debug("Chosen penultimate ap: {}".format(ap2))
+            logger.debug("Ratings available for back planing: {}".
+                         format(prev_events_ratings2))
+
+            # ================================================================
+            ap3 = choice(ap2_node[tension3].keys())
+            logger.debug("Chosen ante-penultimate ap: {}".format(ap3))
+
+            return [ap3, ap2, ap1]
+        # ================================================================
+        prev_events_ratings = []
+        continue
+    # ================================================================
+    return []
+
+tension_curve = ["4.0", "5.0", "5.0"]
 sg = create_story_graph_back(tension_curve)
 story = find_story(sg, tension_curve)
-# print story
+print story
