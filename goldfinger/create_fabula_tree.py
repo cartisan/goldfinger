@@ -1,5 +1,6 @@
 import collections
 from pprint import pprint
+import pdb
 import logging
 from random import choice
 
@@ -52,7 +53,7 @@ def midpoint_to_actionpairs(mp):
     return (action_pair, action_pair2)
 
 
-def find_previous_steps(action):
+def find_next_steps(action, backw=True):
     """ Returns a list of tuples of actionpairs, that each represents
     possible previous steps:
 
@@ -65,15 +66,22 @@ def find_previous_steps(action):
     ]
     """
 
-    logging.debug("Finding previous midpoint for " + str(action))
-    after_midpoint = action[0]
+    if backw:
+        known_midpoint = action[0]
+        column = "After Midpoint"
+        logging.debug("Finding previous midpoint for " + known_midpoint)
+    else:
+        known_midpoint = action[2]
+        column = "Before Midpoint"
+        logging.debug("Finding next midpoint for " + known_midpoint)
+
     try:
         midpoints = find_by_attribute(MIDPOINTS,
-                                      "After Midpoint",
-                                      after_midpoint)
+                                      column,
+                                      known_midpoint)
     except:
         # no midpoints for this action
-        logging.debug("No After Midpoint: " + after_midpoint)
+        logging.debug("No Midpoint: " + known_midpoint)
         return []
 
     # transform (BefM, M, AftM) to [((BefM, rating, M)), (M, rating, AftM)]
@@ -94,6 +102,7 @@ def create_story_graph_backw(climax_tension):
     climaxes = find_by_attribute(ACTION_PAIRS, "Tension", climax_tension)
     logger.debug(str(len(climaxes)) + " climaxes found")
 
+    # create initial set of nodes to expand
     expand_nodes = []
     for climax in climaxes:
         action_pair = (climax["Before"], climax["Tension"], climax["After"])
@@ -102,8 +111,9 @@ def create_story_graph_backw(climax_tension):
         ap_node = story_graph[climax_tension][action_pair]
         expand_nodes.append((ap_node, action_pair))
 
+    # expand nodes
     for current_ap_node, action_pair in expand_nodes:
-        previous_steps = find_previous_steps(action_pair)
+        previous_steps = find_next_steps(action_pair, backw=True)
 
         for (BefMM, MAftM) in previous_steps:
             #               rating   prev ap
@@ -115,39 +125,50 @@ def create_story_graph_backw(climax_tension):
     return story_graph
 
 
-# def create_story_graph_front(tension_curve):
-#     story_graph = Tree()
+def create_story_graph_forw(climax_tension):
+    logger.info(
+        "Forward generating story graph from tension " + climax_tension
+    )
+    story_graph = Tree()
 
-#     climaxes = find_by_attribute(ACTION_PAIRS, "Tension", tension_curve[2])
-#     for climax in climaxes:
-#         action_pair = (climax["Before"], climax["Tension"], climax["After"])
-#         story_graph[tension_curve[2]][action_pair]
+    climaxes = find_by_attribute(ACTION_PAIRS, "Tension", climax_tension)
+    logger.debug(str(len(climaxes)) + " climaxes found")
 
-#     for action_pair in story_graph[tension_curve[2]].keys()[2:3]:
-#         print
-#         print "conflict:", action_pair
-#         previous_steps = find_previous_steps(action_pair, "4.0")
-#         pprint(previous_steps)
-#         for (BefMM, MAftM) in previous_steps:
-#             #        current state           rating   prev ap
-#             story_graph["5.0"][action_pair][MAftM[1]][MAftM]
-#             #                         prev action            rating   first ap        
-#             story_graph["5.0"][action_pair][MAftM[1]][MAftM][BefMM[1]][BefMM]
+    # create initial set of nodes to expand
+    expand_nodes = []
+    for climax in climaxes:
+        action_pair = (climax["Before"], climax["Tension"], climax["After"])
+        # put node in Graph
+        story_graph[climax_tension][action_pair]
+        ap_node = story_graph[climax_tension][action_pair]
+        expand_nodes.append((ap_node, action_pair))
 
-#     return story_graph
+    # expand nodes
+    for current_ap_node, action_pair in expand_nodes:
+        next_steps = find_next_steps(action_pair, backw=False)
+
+        for (BefMM, MAftM) in next_steps:
+            #               rating   next ap
+            current_ap_node[BefMM[1]][BefMM]
+            next_ap_node = current_ap_node[BefMM[1]][BefMM]
+            #            rating   last ap
+            next_ap_node[MAftM[1]][MAftM]
+
+    return story_graph
 
 
-def find_ap_back(story_graph, tension_curve):
-    pass
-
-
-def find_storystep_back(story_graph, tension_curve):
+def find_storystep(story_graph, tension_curve, backw):
     """Takes a story graph of type Tree and a 3-element tension curve,
-    and generates a story consisting of three action pairs that is
+    and back generates a story consisting of three action pairs that is
     consistent with the curve."""
 
-    logger.info("Starting story generation: {}".format(tension_curve))
-    tension1, tension2, tension3 = tension_curve[2], tension_curve[1], tension_curve[0]
+    if backw:
+        tension1, tension2, tension3 = tension_curve[::-1]
+    else:
+        tension1, tension2, tension3 = tension_curve
+    logger.info("Starting story generation: {}".format([tension1,
+                                                        tension2,
+                                                        tension3]))
 
     # ================================================================
     ap1 = None
@@ -213,7 +234,9 @@ def find_storystep_back(story_graph, tension_curve):
             ap3 = choice(ap2_node[tension3].keys())
             logger.debug("Chosen ante-penultimate ap: {}".format(ap3))
 
-            return [ap3, ap2, ap1]
+            if backw:
+                return [ap3, ap2, ap1]
+            return [ap1, ap2, ap3]
         # ================================================================
         prev_events_ratings = []
         continue
@@ -222,8 +245,13 @@ def find_storystep_back(story_graph, tension_curve):
 
 tension_curve = ["3.0", "4.0", "5.0"]
 sg = create_story_graph_backw(tension_curve[-1])
-story = find_storystep_back(sg, tension_curve)
+story = find_storystep(sg, tension_curve, backw=True)
 print story
+
+# tension_curve = ["5.0", "4.0", "3.0"]
+# sg = create_story_graph_forw(tension_curve[0])
+# story = find_storystep(sg, tension_curve, backw=False)
+# print story
 
 # tension_curve = ["1.0", "2.0", "4.0", "5.0", "5.0"]
 # t1 = tension_curve[-3:]
