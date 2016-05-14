@@ -268,7 +268,7 @@ def find_next_storystep(prev_node, tension, next_tension, used_aps):
             return None, None, used_aps
 
 
-def find_story_climax(tension_curve, story_graph_f, story_graph_b):
+def find_story_from_climax(tension_curve, story_graph_f, story_graph_b):
     tension1, tension2, tension3, tension4, tension5 = tension_curve
 
     # ================================================================
@@ -341,11 +341,14 @@ def find_story_climax(tension_curve, story_graph_f, story_graph_b):
     # ================================================================
     return []
 
-tension_curve = ["3.0", "4.0", "5.0", "4.0", "3.0"]
-sg_b = create_story_graph_backw(tension_curve[2])
-sg_f = create_story_graph_forw(tension_curve[2])
-story = find_story_climax(tension_curve, sg_f, sg_b)
-print story
+
+def generate_story(tension_curve=["3.0", "4.0", "5.0", "4.0", "3.0"]):
+    sg_b = create_story_graph_backw(tension_curve[2])
+    sg_f = create_story_graph_forw(tension_curve[2])
+    story = find_story_from_climax(tension_curve, sg_f, sg_b)
+
+    print story
+    return story
 
 # tension_curve = ["5.0", "4.0", "3.0"]
 # sg = create_story_graph_forw(tension_curve[0])

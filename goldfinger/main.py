@@ -2,7 +2,7 @@
 Let's generate a story, shall we?
 '''
 from helpers import die
-from fabula.create_fabula import generate_story
+from fabula.create_fabula_tree import generate_story
 from discourse.core import generate_partial_story, introduction, ending
 from discourse.characters import make_characters, replacefunction
 from discourse.locations import generate_location_story
