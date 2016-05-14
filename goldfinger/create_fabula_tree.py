@@ -171,9 +171,7 @@ def find_storystep(story_graph, tension_curve, backw):
                                                         tension3]))
 
     # ================================================================
-    ap1 = None
     used_ap1 = []
-    prev_events_ratings = None
     possible_prev_ratings = set([])
     while True:
         try:
@@ -199,9 +197,7 @@ def find_storystep(story_graph, tension_curve, backw):
                      format(prev_events_ratings))
 
         # ================================================================
-        ap2 = None
         used_ap2 = []
-        prev_events_ratings2 = None
         possible_prev_ratings2 = set([])
         while True:
             try:
@@ -223,7 +219,6 @@ def find_storystep(story_graph, tension_curve, backw):
 
             if tension3 not in prev_events_ratings2:
                 possible_prev_ratings2 |= set(prev_events_ratings2)
-                prev_events_ratings2 = []
                 continue
 
             logger.debug("Chosen penultimate ap: {}".format(ap2))
@@ -243,9 +238,113 @@ def find_storystep(story_graph, tension_curve, backw):
     # ================================================================
     return []
 
-tension_curve = ["3.0", "4.0", "5.0"]
-sg = create_story_graph_backw(tension_curve[-1])
-story = find_storystep(sg, tension_curve, backw=True)
+
+def find_next_storystep(prev_node, tension, next_tension, used_aps):
+    possible_next_ratings = set([])
+    while True:
+        try:
+            next_ap, used_aps = choice_from_rest(prev_node[tension].keys(),
+                                                 used_aps)
+            next_ap_node = prev_node[tension][next_ap]
+            next_ratings = next_ap_node.keys()
+
+            if next_tension not in next_ratings:
+                possible_next_ratings |= set(next_ratings)
+                continue
+
+            logger.debug("Chosen ap: {}".format(next_ap))
+
+            return next_ap, next_ap_node, used_aps
+
+        except IndexError:
+            # previous node doesn't lead to any ap that would have the right
+            # next tension
+            # break out and jump to continue, that leads to next ap1 choice
+            message = "No ap could be found leading to tension {} "\
+                      .format(next_tension) +\
+                      "but aps leading to tensions {} were available"\
+                      .format(possible_next_ratings)
+            logging.warning(message)
+            return None, None, used_aps
+
+
+def find_story_climax(tension_curve, story_graph_f, story_graph_b):
+    tension1, tension2, tension3, tension4, tension5 = tension_curve
+
+    # ================================================================
+    used_ap1 = []
+    possible_prev_ratings = set([])
+    possible_next_ratings = set([])
+
+    while True:
+        try:
+            # choose one of unused aps
+            # only if they offer the requested 2nd and 4th ratings
+            # if not, note down which alternative ratings are available
+            ap3, used_ap3 = choice_from_rest(story_graph_b[tension3].keys(),
+                                             used_ap1)
+
+            ap3_node_b = story_graph_b[tension3][ap3]
+            prev_events_ratings = ap3_node_b.keys()
+            if tension2 not in prev_events_ratings:
+                possible_prev_ratings |= set(prev_events_ratings)
+                continue
+
+            ap3_node_f = story_graph_f[tension3][ap3]
+            next_events_ratings = ap3_node_f.keys()
+            if tension4 not in next_events_ratings:
+                possible_next_ratings |= set(next_events_ratings)
+                continue
+
+            logger.debug("Chosen climax ap: {}".format(ap3))
+        except IndexError:
+            # tried all possible climax aps
+            message = "No further story could be found with 2nd tension: {} (available: {})" +\
+                      "or 4th tension {} (available: {})".\
+                      format(tension2, possible_prev_ratings,
+                             tension4, possible_next_ratings)
+            logging.warning(message)
+            break
+
+        # ================================================================
+        logger.debug("Finding pre-climax story")
+        used_ap2s = []
+        ap2, ap2_node, used_ap2s = find_next_storystep(ap3_node_b,
+                                                       tension2,
+                                                       tension1,
+                                                       used_ap2s)
+        if not ap2_node:
+            # no continuation for previous story, try other climax
+            logger.debug("No fitting pre story found, trying other climax")
+            continue
+
+        ap1 = choice(ap2_node[tension1].keys())
+        logger.debug("Chosen first ap: {}".format(ap1))
+
+        # ================================================================
+        logger.debug("Finding post-climax story")
+        used_ap4s = []
+        ap4, ap4_node, used_ap4s = find_next_storystep(ap3_node_f,
+                                                       tension4,
+                                                       tension5,
+                                                       used_ap4s)
+        if not ap4_node:
+            # no continuation for next story, try other climax
+            logger.debug("No fitting post story found, trying other climax")
+            continue
+
+        ap5 = choice(ap4_node[tension5].keys())
+        logger.debug("Chosen last ap: {}".format(ap5))
+
+        return [ap1, ap2, ap3, ap4, ap5]
+
+    # ================================================================
+    return []
+
+tension_curve = ["3.0", "4.0", "5.0", "4.0", "3.0"]
+sg_b = create_story_graph_backw(tension_curve[2])
+sg_f = create_story_graph_forw(tension_curve[2])
+story = find_story_climax(tension_curve, sg_f, sg_b)
 print story
 
 # tension_curve = ["5.0", "4.0", "3.0"]
